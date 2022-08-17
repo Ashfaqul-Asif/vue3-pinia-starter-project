@@ -68,10 +68,7 @@ const router = createRouter({
 	]
 })
 
-let isAuth = false
-// console.log(LocalStorageService.getAuthenticationToken, 'LocalStorageService');
 
-// console.log(cookies.get(KEY_AUTH_TOKEN), 'cookies');11
 router.beforeEach((to, from, next) => {
 	var authToken = LocalStorageService.getAuthenticationToken();
 	if (to.matched.some(record => record.meta.requiresAuth)) {
