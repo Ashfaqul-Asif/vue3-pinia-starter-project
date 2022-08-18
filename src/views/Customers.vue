@@ -1,47 +1,45 @@
 <template>
 	<v-card class="p" elevation="2">
-		<h1>Customers</h1>
+		<h1>Customers {{state.count}}</h1>
 	</v-card>
 </template>
 
 <script>
-// import { defineComponent } from 'vue';
-// import { reactive } from 'vue-demi'
-// import { ref } from 'vue'
-import { $customers } from '../stores/customers'
-const customers = $customers
+import { defineComponent } from 'vue';
+import { reactive } from 'vue-demi'
+import { ref, onMounted } from 'vue'
+import { $customersStore } from '../stores/customers'
 export default {
-	name: 'HomeView',
 	data() {
 		return {
-			headers: [
-				{ text: 'Name', value: 'name', sortable: false },
-				{ text: 'Course Taken', value: 'courseTaken', sortable: false },
-				{ text: 'Hours Spent', value: 'hoursSpent', sortable: false },
-				{ text: 'Enrolment Date', value: 'enrolledAt', sortable: false },
-				{ text: 'Live ID', value: 'liveId', sortable: false },
-				{ text: 'View', value: 'actions', sortable: false },
-			],
-			loading: false,
+			error: {
+				dialog: false,
+				message: "",
+			}
 		};
 	},
-	methods: {
+	setup() {
+		const $customers = $customersStore()
+		const dialog = ref(false)
+		const loading = ref(false)
+		// const customers = reactive(null)
+		const state = reactive({
+			count: null
+		});
+		const getCustomers = async () => {
+			loading.value = true
+			let [res, err] = await $customers.getCustomers()
+			if (res) {
+				console.log(res);
+				state.count = res
+			}
+			loading.value = false
+		}
+		onMounted(() => {
+			getCustomers() // <div>
+		})
+		return { $customers, getCustomers, dialog, loading, state }
+	},
 
-	},
-	async created() {
-		await customers.getCustomers()
-	},
-	// setup() {
-	// 	const $customer = customer()
-	// 	const headers = reactive([
-	// 		{ text: 'Name', value: 'name', sortable: false },
-	// 		{ text: 'Course Taken', value: 'courseTaken', sortable: false },
-	// 		{ text: 'Hours Spent', value: 'hoursSpent', sortable: false },
-	// 		{ text: 'Enrolment Date', value: 'enrolledAt', sortable: false },
-	// 		{ text: 'Live ID', value: 'liveId', sortable: false },
-	// 		{ text: 'View', value: 'actions', sortable: false },
-	// 	])
-	// 	return { auth, $customer }
-	// }
-};
+}
 </script>

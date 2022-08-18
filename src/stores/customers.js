@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { $axios } from '@/api/handler'
 
 
-export const $customers = defineStore('auth', {
+export const $customersStore = defineStore('auth', {
 	state: () => ({
 		allCustomers: null,
 		customers: null,
