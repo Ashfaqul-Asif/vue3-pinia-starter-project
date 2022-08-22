@@ -17,7 +17,7 @@ export const $workOrdersStore = defineStore('workOrders', {
 	actions: {
 		async getAllWorkOrders() {
 			try {
-				let response = await $axios.get('v1.0/workOrders/GetAll')
+				let response = await $axios.get('v1.0/WorkOrders/GetAll')
 				this.allWorkOrders = response
 				return [response, null]
 
@@ -27,7 +27,7 @@ export const $workOrdersStore = defineStore('workOrders', {
 		},
 		async getworkOrders() {
 			try {
-				let response = await $axios.get(`workOrders?api-version=1.0`)
+				let response = await $axios.get(`WorkOrders?api-version=1.0`)
 				return [response, null]
 
 			} catch (error) {
@@ -36,7 +36,7 @@ export const $workOrdersStore = defineStore('workOrders', {
 		},
 		async getWorkOrderById(id) {
 			try {
-				let response = await $axios.get(`v1.0/workOrders/${id}`)
+				let response = await $axios.get(`v1.0/WorkOrders/${id}`)
 				this.workOrder = response
 				return [response, null]
 
@@ -46,7 +46,7 @@ export const $workOrdersStore = defineStore('workOrders', {
 		},
 		async createWorkOrder(data) {
 			try {
-				let response = await $axios.post('v1.0/workOrders', data)
+				let response = await $axios.post('WorkOrders?api-version=1.0', data)
 				return [response, null]
 
 			} catch (error) {
@@ -55,7 +55,7 @@ export const $workOrdersStore = defineStore('workOrders', {
 		},
 		async updateWorkOrder(data, id) {
 			try {
-				let response = await $axios.put(`v1.0/workOrders/id`, data)
+				let response = await $axios.put(`v1.0/WorkOrders/id`, data)
 				return [response, null]
 
 			} catch (error) {
@@ -64,7 +64,7 @@ export const $workOrdersStore = defineStore('workOrders', {
 		},
 		async deleteWorkOrder(id) {
 			try {
-				let response = await $axios.delete(`v1.0/workOrders/${id}`)
+				let response = await $axios.delete(`v1.0/WorkOrders/${id}`)
 				return [response, null]
 
 			} catch (error) {

@@ -24,9 +24,11 @@
 			<tbody v-if="workOrders.data">
 				<tr v-for="(item,i) in workOrders.data.items" :key="i">
 					<td>{{ item.description }}</td>
-					<td>{{ item.dropDeadDateTime }}</td>
-					<td>{{ item.orderDateTime }}</td>
-					<td>{{ item.targetDateTime }}</td>
+					<td>{{ moment(item.dropDeadDateTime).format('MM-DD-YYYY') }}</td>
+
+					<td>{{ moment(item.orderDateTime).format('MM-DD-YYYY') }}</td>
+					<td>{{ moment(item.targetDateTime).format('MM-DD-YYYY') }}</td>
+
 					<td>{{ item.total }}</td>
 
 					<td class="d-flex align-center">
@@ -65,17 +67,29 @@
 								<input v-model="workOrderData.dropDeadDateTime" type="date" />
 							</v-col>
 							<v-col cols="12" md="6">
-								<v-text-field label="total" v-model="workOrderData.total" required></v-text-field>
+								<v-text-field type="number" label="total" v-model="workOrderData.total" required></v-text-field>
 							</v-col>
-							<v-select label="Customer"></v-select>
+							<v-select
+								:items="allCustomers.data"
+								item-title="accountNumber"
+								item-value="id"
+								label="Customer"
+								v-model="workOrderData.customerId"
+							></v-select>
 						</v-row>
 					</v-form>
 				</v-card-text>
 				<div class="px-6 pt-3 pb-3 d-flex">
 					<v-btn @click="closeDialog" class="mr-3" outlined color="error">Cancel</v-btn>
 
-					<v-btn v-if="isUpdate" @click="updateWorkOrder" outlined color="primary">Update</v-btn>
-					<v-btn v-else @click="createWorkOrders" outlined color="primary">Create</v-btn>
+					<v-btn
+						:loading="loading"
+						v-if="isUpdate"
+						@click="updateWorkOrder"
+						outlined
+						color="primary"
+					>Update</v-btn>
+					<v-btn :loading="loading" v-else @click="createWorkOrders" outlined color="primary">Create</v-btn>
 				</div>
 			</v-card>
 		</v-dialog>
@@ -90,8 +104,6 @@ import moment from 'moment'
 import { $customersStore } from '../stores/customers'
 
 export default {
-
-
 	setup() {
 		const $workOrders = $workOrdersStore()
 		const $customers = $customersStore()
@@ -103,10 +115,12 @@ export default {
 		const loading = ref(false)
 		const id = ref(null)
 
-		// const customers = reactive(null)
+		const allCustomers = reactive({
+			data: null
+		})
 		const workOrders = reactive({
 			data: null
-		});
+		})
 		const workOrderData = reactive({
 			customerId: null,
 			orderDateTime: null,
@@ -120,11 +134,12 @@ export default {
 			let [res, err] = await $workOrders.deleteWorkOrder(id)
 			if (res) {
 				console.log(res);
-				workOrders.data = res.data
+				workOrders = res.data
 			}
 			loading.value = false
 		}
 		const getworkOrders = async () => {
+			console.log('getworkOrders');
 			loading.value = true
 			let [res, err] = await $workOrders.getworkOrders()
 			if (res) {
@@ -133,13 +148,15 @@ export default {
 			}
 			loading.value = false
 		}
-		const createworkOrders = async () => {
-			console.log('createworkOrders');
+		const createWorkOrders = async () => {
+			console.log('createWorkOrders');
 			loading.value = true
 			let [res, err] = await $workOrders.createWorkOrder(workOrderData)
 			if (res) {
 				console.log(res);
-				workOrders.data = res.data
+				dialog.value = false
+				await getworkOrders()
+
 			}
 			loading.value = false
 		}
@@ -152,7 +169,6 @@ export default {
 			workOrderData.dropDeadDateTime = item.dropDeadDateTime
 			workOrderData.description = item.description
 			workOrderData.total = item.total
-
 			id.value = item.id
 			dialog.value = true
 
@@ -162,9 +178,10 @@ export default {
 			let [res, err] = await $workOrders.updateWorkOrder(workOrderData, id.value)
 			if (res) {
 				console.log(res);
-				workOrders.data = res.data
 			}
 			loading.value = false
+			await getworkOrders()
+
 		}
 		const openDialog = () => {
 			workOrderData.customerId = null
@@ -184,14 +201,15 @@ export default {
 			let [res, err] = await $customers.getAllCustomers()
 			if (res) {
 				console.log(res);
-				customers.data = res.data
+				allCustomers.data = res.data
 			}
 			loading.value = false
 		}
 		onMounted(() => {
-			getworkOrders() // <div>
+			getworkOrders()
+			getAllCustomers() // <div>
 		})
-		return { $workOrders, getworkOrders, dialog, loading, workOrders, handleDelete, openDialog, isUpdate, workOrderData, closeDialog, createworkOrders, updateWorkOrder, openModalFromEdit, id, getAllCustomers }
+		return { $workOrders, getworkOrders, dialog, loading, workOrders, handleDelete, openDialog, isUpdate, workOrderData, closeDialog, createWorkOrders, updateWorkOrder, openModalFromEdit, id, getAllCustomers, moment, allCustomers }
 	},
 
 }
