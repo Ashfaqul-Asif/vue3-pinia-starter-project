@@ -127,14 +127,17 @@ export default {
 			targetDateTime: null,
 			dropDeadDateTime: null,
 			description: null,
-			total: null
+			total: null,
+			id: null
 		});
 		const handleDelete = async (id) => {
 			loading.value = true
 			let [res, err] = await $workOrders.deleteWorkOrder(id)
 			if (res) {
 				console.log(res);
-				workOrders.data = res.data
+				setTimeout(() => {
+					 getworkOrders()
+				}, 1000);
 			}
 			loading.value = false
 		}
@@ -156,19 +159,22 @@ export default {
 				console.log(res);
 				dialog.value = false
 				await getworkOrders()
-
 			}
 			loading.value = false
+
+
 		}
 
 		const openModalFromEdit = (item) => {
 			isUpdate.value = true
 			workOrderData.customerId = item.customerId
-			workOrderData.orderDateTime = item.orderDateTime
-			workOrderData.targetDateTime = item.targetDateTime
-			workOrderData.dropDeadDateTime = item.dropDeadDateTime
+			workOrderData.orderDateTime = moment(item.orderDateTime).format('mm-dd-yyyy')
+			workOrderData.targetDateTime = moment(item.targetDateTime).format('mm-dd-yyyy')
+			workOrderData.dropDeadDateTime = moment(item.dropDeadDateTime).format('mm-dd-yyyy')
 			workOrderData.description = item.description
 			workOrderData.total = item.total
+			workOrderData.id = item.id
+
 			id.value = item.id
 			dialog.value = true
 
@@ -178,9 +184,13 @@ export default {
 			let [res, err] = await $workOrders.updateWorkOrder(workOrderData, id.value)
 			if (res) {
 				console.log(res);
+				dialog.value = false
+				await getworkOrders()
+				loading.value = false
 			}
 			loading.value = false
-			await getworkOrders()
+
+
 
 		}
 		const openDialog = () => {

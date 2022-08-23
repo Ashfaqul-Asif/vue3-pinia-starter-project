@@ -12,25 +12,25 @@
 		<v-table>
 			<thead>
 				<tr>
-					<th class="text-left">Description</th>
-					<th class="text-left">Drop Date</th>
-					<th class="text-left">Order Date</th>
-					<th class="text-left">Target Date</th>
-					<th class="text-left">Total</th>
-
+					<th class="text-left">Notes</th>
+					<th class="text-left">Service item</th>
+					<th class="text-left">Labor hours</th>
+					<th class="text-left">Rate</th>
+					<th class="text-left">Extended price</th>
+					<th class="text-left">Percent complete</th>
 					<th class="text-left"></th>
 				</tr>
 			</thead>
-			{{labors.data}}
+
 			<tbody v-if="labors.data">
-				<tr v-for="(item,i) in labors.data.items" :key="i">
-					<td>{{ item.description }}</td>
-					<td>{{ moment(item.dropDeadDateTime).format('MM-DD-YYYY') }}</td>
+				<tr v-for="(item,i) in labors.data" :key="i">
+					<td>{{ item.notes }}</td>
+					<td>{{ item.serviceItemName }}</td>
 
-					<td>{{ moment(item.orderDateTime).format('MM-DD-YYYY') }}</td>
-					<td>{{ moment(item.targetDateTime).format('MM-DD-YYYY') }}</td>
-
-					<td>{{ item.total }}</td>
+					<td>{{ item.laborHours }}</td>
+					<td>{{ item.rate }}</td>
+					<td>{{ item.extendedPrice }}</td>
+					<td>{{ item.percentComplete }}</td>
 
 					<td class="d-flex align-center">
 						<v-btn @click="openModalFromEdit(item)" class="mr-1" size="x-small" icon>
@@ -45,37 +45,37 @@
 		</v-table>
 		<v-dialog scrollable persistent v-model="dialog" :max-width="'860px'">
 			<v-card>
-				<v-card-title class="text-center">{{isUpdate ? 'Edit Customer' :'Create Customer'}}</v-card-title>
+				<v-card-title class="text-center">{{isUpdate ? 'Edit Labor' :'Create Labor'}}</v-card-title>
 				<v-card-text>
 					<v-form>
 						<v-row>
 							<v-col cols="12" md="6">
-								<v-text-field label="Description" v-model="workOrderData.description" required></v-text-field>
+								<v-text-field label="Notes" v-model="laborData.notes" required></v-text-field>
 							</v-col>
 							<v-col cols="12" md="6">
-								<span>Order Date Time</span>
-								<br />
-								<input v-model="workOrderData.orderDateTime" type="date" />
+								<v-text-field label="Service item code" v-model="laborData.serviceItemCode" required></v-text-field>
 							</v-col>
 							<v-col cols="12" md="6">
-								<span>Target Date Time</span>
-								<br />
-								<input v-model="workOrderData.targetDateTime" type="date" />
+								<v-text-field label="Service item name" v-model="laborData.serviceItemName" required></v-text-field>
 							</v-col>
 							<v-col cols="12" md="6">
-								<span>Drop Dead DateTime</span>
-								<br />
-								<input v-model="workOrderData.dropDeadDateTime" type="date" />
+								<v-text-field label="Hours" v-model="laborData.laborHours" required></v-text-field>
 							</v-col>
 							<v-col cols="12" md="6">
-								<v-text-field type="number" label="total" v-model="workOrderData.total" required></v-text-field>
+								<v-text-field label="rate" v-model="laborData.rate" required></v-text-field>
+							</v-col>
+							<v-col cols="12" md="6">
+								<v-text-field label="Extended price" v-model="laborData.extendedPrice" required></v-text-field>
+							</v-col>
+							<v-col cols="12" md="6">
+								<v-text-field label="Percent complete" v-model="laborData.percentComplete" required></v-text-field>
 							</v-col>
 							<v-select
 								:items="allWorkOrders.data"
-								item-title="accountNumber"
+								item-title="description"
 								item-value="id"
-								label="Customer"
-								v-model="workOrderData.customerId"
+								label="Work order"
+								v-model="laborData.workOrderId"
 							></v-select>
 						</v-row>
 					</v-form>
@@ -116,19 +116,23 @@ export default {
 		const labors = reactive({
 			data: null
 		})
-		const workOrderData = reactive({
-			customerId: null,
-			orderDateTime: null,
-			targetDateTime: null,
-			dropDeadDateTime: null,
-			description: null,
-			total: null
+		const laborData = reactive({
+			workOrderId: null,
+			serviceItemCode: null,
+			serviceItemName: null,
+			laborHours: null,
+			rate: null,
+			extendedPrice: null,
+			notes: null,
+			percentComplete: null,
+			id: null
 		});
 		const handleDelete = async (id) => {
 			loading.value = true
 			let [res, err] = await $labors.deleteLabor(id)
 			if (res) {
 				console.log(res);
+				await getLabors()
 			}
 			loading.value = false
 		}
@@ -145,7 +149,7 @@ export default {
 		const createLabors = async () => {
 			console.log('createLabors');
 			loading.value = true
-			let [res, err] = await $labors.createLabor(workOrderData)
+			let [res, err] = await $labors.createLabor(laborData)
 			if (res) {
 				console.log(res);
 				dialog.value = false
@@ -157,33 +161,40 @@ export default {
 
 		const openModalFromEdit = (item) => {
 			isUpdate.value = true
-			workOrderData.customerId = item.customerId
-			workOrderData.orderDateTime = item.orderDateTime
-			workOrderData.targetDateTime = item.targetDateTime
-			workOrderData.dropDeadDateTime = item.dropDeadDateTime
-			workOrderData.description = item.description
-			workOrderData.total = item.total
+			laborData.workOrderId = item.workOrderId
+			laborData.serviceItemCode = item.serviceItemCode
+			laborData.serviceItemName = item.serviceItemName
+			laborData.laborHours = item.laborHours
+			laborData.notes = item.notes
+			laborData.rate = item.rate
+			laborData.extendedPrice = item.extendedPrice
+			laborData.percentComplete = item.percentComplete
+			laborData.id = item.id
+
 			id.value = item.id
 			dialog.value = true
 
 		}
 		const updateLabor = async () => {
 			loading.value = true
-			let [res, err] = await $labors.updateLabor(workOrderData, id.value)
+			let [res, err] = await $labors.updateLabor(laborData, id.value)
 			if (res) {
 				console.log(res);
+				dialog.value = false
 			}
 			loading.value = false
 			await getLabors()
 
 		}
 		const openDialog = () => {
-			workOrderData.customerId = null
-			workOrderData.orderDateTime = null
-			workOrderData.targetDateTime = null
-			workOrderData.dropDeadDateTime = null
-			workOrderData.description = null
-			workOrderData.total = null
+			laborData.workOrderId = null
+			laborData.serviceItemCode = null
+			laborData.serviceItemName = null
+			laborData.laborHours = null
+			laborData.notes = null
+			laborData.rate = null
+			laborData.extendedPrice = null
+			laborData.percentComplete = null
 			isUpdate.value = false
 			dialog.value = true
 		}
@@ -203,7 +214,7 @@ export default {
 			getLabors()
 			getAllWorkOrders() // <div>
 		})
-		return { $labors, $workOrders, getLabors, dialog, loading, labors, handleDelete, openDialog, isUpdate, workOrderData, closeDialog, createLabors, updateLabor, openModalFromEdit, id, getAllWorkOrders, moment, allWorkOrders }
+		return { $labors, $workOrders, getLabors, dialog, loading, labors, handleDelete, openDialog, isUpdate, laborData, closeDialog, createLabors, updateLabor, openModalFromEdit, id, getAllWorkOrders, moment, allWorkOrders }
 	},
 
 }

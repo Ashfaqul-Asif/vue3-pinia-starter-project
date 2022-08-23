@@ -69,8 +69,14 @@
 				<div class="px-6 pt-3 pb-3 d-flex">
 					<v-btn @click="closeDialog" class="mr-3" outlined color="error">Cancel</v-btn>
 
-					<v-btn v-if="isUpdate" @click="updateCustomer" outlined color="primary">Update</v-btn>
-					<v-btn v-else @click="createCustomers" outlined color="primary">Create</v-btn>
+					<v-btn
+						:loading="loading"
+						v-if="isUpdate"
+						@click="updateCustomer"
+						outlined
+						color="primary"
+					>Update</v-btn>
+					<v-btn :loading="loading" v-else @click="createCustomers" outlined color="primary">Create</v-btn>
 				</div>
 			</v-card>
 		</v-dialog>
@@ -103,7 +109,8 @@ export default {
 			city: null,
 			state: null,
 			zipCode: null,
-			phone: null
+			phone: null,
+			id: null
 		});
 		const handleDelete = async (id) => {
 			loading.value = true
@@ -130,8 +137,10 @@ export default {
 			if (res) {
 				console.log(res);
 				customers.data = res.data
+				loading.value = false
+				dialog.value = false
+				getCustomers()
 			}
-			loading.value = false
 		}
 
 		const openModalFromEdit = (item) => {
@@ -143,6 +152,8 @@ export default {
 			customerData.state = item.state
 			customerData.zipCode = item.zipCode
 			customerData.phone = item.phone
+			customerData.id = item.id
+
 			id.value = item.id
 			dialog.value = true
 
@@ -152,9 +163,11 @@ export default {
 			let [res, err] = await $customers.updateCustomer(customerData, id.value)
 			if (res) {
 				console.log(res);
-				customers.data = res.data
+				loading.value = false
+				dialog.value = false
+				getCustomers()
+
 			}
-			loading.value = false
 		}
 		const openDialog = () => {
 			customerData.accountNumber = null
