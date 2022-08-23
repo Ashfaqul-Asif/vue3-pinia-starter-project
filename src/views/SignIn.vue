@@ -17,9 +17,7 @@
 					>Incorrect email or password</v-alert>
 					<v-text-field v-model="loginData.email" label="E-mail" required></v-text-field>
 					<v-text-field
-						:type="password.show ? 'text' : 'password'"
-						:append-inner-icon="password.show ? 'mdi-eye' : 'mdi-eye-off'"
-						@click:append="password.show = !password.show"
+						type="password"
 						hide-details="auto"
 						v-model="loginData.password"
 						label="Password"
@@ -61,7 +59,7 @@ export default {
 			show: false,
 			confirmed: false
 		})
-
+     
 		const handleLogin = async () => {
 			console.log(loginForm, 'loginForm');
 			loading.value = true

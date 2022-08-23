@@ -17,7 +17,7 @@ export const $workOrdersStore = defineStore('workOrders', {
 	actions: {
 		async getAllWorkOrders() {
 			try {
-				let response = await $axios.get('v1.0/WorkOrders/GetAll')
+				let response = await $axios.get('WorkOrders/GetAll?api-version=1.0')
 				this.allWorkOrders = response
 				return [response, null]
 

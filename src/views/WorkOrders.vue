@@ -134,7 +134,7 @@ export default {
 			let [res, err] = await $workOrders.deleteWorkOrder(id)
 			if (res) {
 				console.log(res);
-				workOrders = res.data
+				workOrders.data = res.data
 			}
 			loading.value = false
 		}
