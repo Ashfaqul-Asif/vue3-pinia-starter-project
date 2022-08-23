@@ -46,7 +46,7 @@ export const $laborsStore = defineStore('labors', {
 		},
 		async createLabor(data) {
 			try {
-				let response = await $axios.post('v1.0/Labors', data)
+				let response = await $axios.post('Labors?api-version=1.0', data)
 				return [response, null]
 
 			} catch (error) {
@@ -56,7 +56,7 @@ export const $laborsStore = defineStore('labors', {
 		async updateLabor(data, id) {
 			console.log(data, id, 'updateLabor');
 			try {
-				let response = await $axios.put(`v1.0/Labors/${id}`, data)
+				let response = await $axios.put(`Labors/${id}?api-version=1.0`, data)
 				return [response, null]
 
 			} catch (error) {
@@ -65,7 +65,7 @@ export const $laborsStore = defineStore('labors', {
 		},
 		async deleteLabor(id) {
 			try {
-				let response = await $axios.delete(`v1.0/Labors/${id}`)
+				let response = await $axios.delete(`Labors/${id}?api-version=1.0`)
 				return [response, null]
 
 			} catch (error) {

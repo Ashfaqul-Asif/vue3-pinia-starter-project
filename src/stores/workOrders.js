@@ -55,7 +55,7 @@ export const $workOrdersStore = defineStore('workOrders', {
 		},
 		async updateWorkOrder(data, id) {
 			try {
-				let response = await $axios.put(`v1.0/WorkOrders/id`, data)
+				let response = await $axios.put(`WorkOrders/${id}?api-version=1.0`, data)
 				return [response, null]
 
 			} catch (error) {
@@ -64,7 +64,7 @@ export const $workOrdersStore = defineStore('workOrders', {
 		},
 		async deleteWorkOrder(id) {
 			try {
-				let response = await $axios.delete(`v1.0/WorkOrders/${id}`)
+				let response = await $axios.delete(`WorkOrders/${id}?api-version=1.0`)
 				return [response, null]
 
 			} catch (error) {
